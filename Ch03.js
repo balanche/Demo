@@ -111,18 +111,6 @@ function testDataType() {
     let msg6 = Symbol.for('foo');
     console.log(msg5 === msg6); // true
     console.log(msg3 === msg5); // false
-
-
-    /**
-     * 其他：key 值为变量，使用 []
-     */
-    let abc = 'userName';
-    let CEO = {
-        [abc]: 'Tom',
-        sex: 'male'
-    }
-    console.log(JSON.stringify(CEO));
-    console.log('\n'); 
 }
 
 testConst();
