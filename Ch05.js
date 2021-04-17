@@ -140,8 +140,8 @@ function testArray() {
     const s = new Set().add('h').add('e');
     console.log(Array.from(s));// ['h', 'e']
     // Map
-    const m = new Map().set(0, 'h').set(1, 'e')
-    console.log(Array.from(m));// [0, 'h'],[1, 'e']
+    const m = new Map().set('A', 'h').set('B', 'e')
+    console.log(Array.from(m));// ['A', 'h'],['B', 'e']
     // 迭代器
     const iter = {
         *[Symbol.iterator]() {
@@ -315,6 +315,141 @@ function testArray() {
     );// 2
 }
 
+function testMap() {
+    /**
+     * 定义/添加键值对的三种方法
+     */
+    // 方法一：嵌套数组初始化
+    const m = new Map([
+        ['A','h'],
+        ['B','e'],
+        ['C','l'],
+        ['D','l'],
+        ['E','o'],
+        ['F','!']
+    ]);
+
+    // 方法二：set 添加
+    // const m = new Map()
+    //     .set('A','h')
+    //     .set('B','e')
+    //     .set('C','l')
+    //     .set('D','l')
+    //     .set('E','o')
+
+    // 方法三：迭代器初始化
+    // const m = new Map({
+    //     [Symbol.iterator]: function*() {
+    //         yield ['1A','h'];
+    //         yield ['2B','e'];
+    //         yield ['3C','l'];
+    //         yield ['4D','l'];
+    //         yield ['5E','o'];
+    //     } 
+    // });
+
+    // size 属性
+    console.log(m.size);// 5
+    // 判断键值对是否存在
+    console.log(m.has('F'));// true
+    // 删除操作
+    m.delete('F');
+    console.log(m.has('F'));// false
+
+    /**
+     * 迭代方法
+     */
+    m.forEach((v,k) => {
+        console.log(k + ':' + v);// 依次打印 依次打印 '1A':'h'、'2B':'e'、'3C':'l'、'4D':'l'、'5E':'o'
+    });
+    console.log([...m]);// [ ['1A', 'h'],['2B','e'],['3C','l'],['4D','l'],['5E','o'] ]
+
+    /**
+     * 迭代器
+     */
+    for (const k of m.keys()) {
+        console.log(k);// 依次打印 1A、2B、3C、4D、5E
+    }
+    for (const v of m.values()) {
+        console.log(v);// 依次打印 h、e、l、l、o
+    }
+    for (const [k,v] of m.entries()) {// 注意这里是 [k,v]。等同于 'for(const [k,v] of m[Symbol.iterator]())'
+        console.log(k + ':' + v);// 依次打印 '1A':'h'、'2B':'e'、'3C':'l'、'4D':'l'、'5E':'o'
+    }
+    console.log(m.entries === m[Symbol.iterator]);// true
+
+    /**
+     * 改变 map 中的 key 规则（与复制变量值、传递参数规则一致）
+     */
+    let keyO = {id: '1A'}
+    let keyBaseType = 11;
+    let ma = new Map([
+        [keyO, 'h']
+        ,[keyBaseType, 'e']
+    ]);
+    for (let k of ma.keys()) {
+        console.log(JSON.stringify(k));// 依次输出 {"id":"1A"}、11
+    }
+    keyO.id = '2B';
+    keyBaseType = 22;
+    for (let k of ma.keys()) {
+        console.log(JSON.stringify(k));// 依次输出 {"id":"2B"}、11
+    }
+    console.log([...ma]);// [ [{"id":"1A"},'h'],[11,'e'] ]
+    ma.clear();// 清空 map 内容
+    console.log([...ma]);// []
+}
+
+function testSet() {
+    /**
+     * 定义/添加集合的三种方法
+     */
+    // 方法一：数组初始化
+    const s = new Set([
+        'h','e','l','o','!'
+    ])
+
+    // 方法二：add 添加
+    // const s = new Set()
+    //     .add('h')
+    //     .add('e')
+    //     .add('l')
+    //     .add('o');
+
+    // 方法三：迭代器初始化
+    // const s = new Set({
+    //     [Symbol.iterator]:function*(){
+    //         yield 'h';
+    //         yield 'e';
+    //         yield 'l';
+    //         yield 'o';
+    //     }
+    // });
+
+    console.log(s.size);// 5
+    console.log(s.has('!'));// true
+    s.delete('!');
+    console.log(s.has('!'));// false
+    
+    s.forEach(v => {
+        console.log(v);// 依次输出 'h'、'e'、'l'、'o'
+    });
+    console.log([...s]);// ['h', 'e', 'l', 'o']
+
+    // 【与Map不同】s.values、s.keys、s[Symbol.iterator 是相等的
+    console.log(s.values === s[Symbol.iterator]);// true
+    console.log(s.keys === s[Symbol.iterator]);// true
+    for (const v of s.values()) {
+       console.log(v);// 依次输出 'h'、'e'、'l'、'o'
+    }
+    // 【与Map不同】集合的 entries 中的
+    for (const [k,v] of s.entries()) {// const pair of s.entries()
+        console.log(k + ':' + v);// 依次输出 'h':'h'、'e':'e'、'l':'l'、'o':'o'
+        // console.log(pair);// 依次输出 ['h', 'h']、['e', 'e']、['l', 'l']、['o', 'o']
+    }
+}
+
+
 function testTransferArrayString() {
     const arr1 = ['hello'];
     const arr2 = ['h','e','l','l','o'];
@@ -363,6 +498,8 @@ function testTransferArrayString() {
 // testString();
 // testMath();
 // testObject();
-testArray();
+// testArray();
+// testMap();
+testSet();
 
 // testTransferArrayString();
