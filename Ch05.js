@@ -141,7 +141,7 @@ function testArray() {
     console.log(Array.from(s));// ['h', 'e']
     // Map
     const m = new Map().set('A', 'h').set('B', 'e')
-    console.log(Array.from(m));// ['A', 'h'],['B', 'e']
+    console.log(Array.from(m));// [ ['A', 'h'],['B', 'e'] ]
     // 迭代器
     const iter = {
         *[Symbol.iterator]() {
@@ -335,7 +335,7 @@ function testMap() {
     //     .set('B','e')
     //     .set('C','l')
     //     .set('D','l')
-    //     .set('E','o')
+    //     .set('E','o');
 
     // 方法三：迭代器初始化
     // const m = new Map({
