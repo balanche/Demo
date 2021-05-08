@@ -4,10 +4,12 @@ function testObject() {
      * 因为对象属性可以通过点来访问，也可以通过方括号来表示
      */
     let n = 'userName';
-    let CEO = {
-        [n]: 'Tom',
-        sex: 'male'
-    }
+    let CEO = {sex: 'male'}
+    CEO[n] = 'Tom';
+    // let CEO = {
+    //     [n]: 'Tom',
+    //     sex: 'male'
+    // }
     console.log(JSON.stringify(CEO));// {"userName":"Tom","sex":"male"}
     console.log(CEO.userName);// Tom
     console.log(CEO[n]);// Tom
@@ -15,7 +17,7 @@ function testObject() {
 }
 
 function testArray() {
-    const arr = ['h','e','l','l','o'];
+    let arr = ['h','e','l','l','o'];
     const str = 'hello world';
 
     // 数组解构
@@ -30,6 +32,12 @@ function testArray() {
     // 扩展操作符：使用任何可以迭代的变量
     console.log([...str]);// ['h', 'e', 'l', 'l', 'o', ' ', 'w', 'o', 'r', 'l', 'd']
 
+    let nArr = [...arr];
+    let nArr2 = [...arr];
+    console.log(nArr);// ['h', 'e', 'l', 'l', 'o']
+    console.log(nArr == arr);// false
+    console.log(nArr2 == arr);// true
+
     /**
      * Array.from 用法：适用任何可以迭代的结构
      * 第一个参数：任何可迭代的结构
@@ -38,7 +46,7 @@ function testArray() {
      */
     // 字符串。同 [...str]
     console.log(Array.from(str));// ['h', 'e', 'l', 'l', 'o', ' ', 'w', 'o', 'r', 'l', 'd']
-    // 数组。浅复制
+    // 数组。
     const copyArr = Array.from(arr);
     console.log(arr);// ['h', 'e', 'l', 'l', 'o']
     console.log('arr === copyArr //' +(arr === copyArr));// false
@@ -341,7 +349,7 @@ function testSet() {
     });
     console.log([...s]);// ['h', 'e', 'l', 'o']
 
-    // 【与Map不同】s.values、s.keys、s[Symbol.iterator 是相等的
+    // 【与Map不同】s.values、s.keys、s[Symbol.iterator] 是相等的
     console.log(s.values === s[Symbol.iterator]);// true
     console.log(s.keys === s[Symbol.iterator]);// true
     for (const v of s.values()) {
