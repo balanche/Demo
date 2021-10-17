@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Event Handler Example</title>
+</head>
+<body>
+    <form method="post">
+        <input type="text" name="username" value="Tom">
+        <input type="button" id="mBtn" value="Click Me" onclick="btnOnclick(username.value)"/>
+
+        <ul id="myLinks">
+            <li id="goSomewhere">Go somewhere</li>
+            <li id="doSomething">Do something</li>
+            <li id="sayHi">Say hi</li>
+        </ul>
+    </form>
+    <script type="text/javascript">
+        var btn = document.getElementById("mBtn");
+        btnOnclick = function(v) {// 注意，此方式会被 DOM0、DOM2 的事件处理覆盖，需注释btn.onclick、btn.addEventListener
+            console.log('=== HTML 事件处理：目标阶段 ===');
+            console.log((this == window) + ',' + (this == event.target) + ',' + this.id);// true,false,mBtn
+            console.log(window.event.type);// click
+            console.log(v)// Tom
+
+            console.log(window.event.target);// input#mBtn
+            console.log(window.event.currentTarget);// input#mBtn
+            console.log(window.event.eventPhase);// 2
+        };
+
+        btn.onclick = function (e) {
+            console.log('=== DOM0 事件处理：目标阶段 ===');
+            console.log((this == window) + ',' + (this == e.target) + ',' + this.id);// false,true,mBtn
+            console.log(e.type);// click
+
+            console.log(e.target);// input#mBtn
+            console.log(e.currentTarget);// input#mBtn
+            console.log(e.eventPhase);// 2
+        };
+
+        btn.addEventListener('click', function (e) {
+            console.log('=== DOM2 事件处理：目标 ===');
+            console.log((this == window) + ',' + (this == e.target) + ',' + this.id);// false,true,mBtn
+            console.log(e.type);// click
+
+            console.log(e.target);// input#mBtn
+            console.log(e.currentTarget);// input#mBtn
+            console.log(e.eventPhase);// 2
+        }, true);
+
+        // btn.attachEvent('onclick', function () {// 需要使用 IE 浏览器运行
+        //     console.log('=== IE 事件处理：目标 ===');
+        //     console.log((this == window) + ',' + (this == event.target) + ',' + this.id);// true,false,undefined
+        //     console.log(window.event.type);// click
+
+        //     console.log(window.event.srcElement);// input#mBtn
+        // });
+
+        document.body.onclick = function (e) {
+            console.log('=== body DOM0 事件处理：冒泡阶段 ===');
+            console.log(e.target);// input#mBtn
+            console.log(e.currentTarget);// body
+            console.log(e.eventPhase);// 3
+        };
+
+        document.body.addEventListener('click', function (e) {
+            console.log('=== body DOM2 事件处理：false-冒泡阶段、true-捕获阶段 ===');
+            console.log(e.target);// input#mBtn
+            console.log(e.currentTarget);// body
+            console.log(e.eventPhase);// 1
+        }, true);
+
+        // 跨浏览器事件
+        let EventUtil = {
+            // element 上添加 type 事件监听
+            addHandler: function(element, type, handler) {
+                if(element.addEventListener) {// DOM2
+                    element.addEventListener(type, handler, false);
+                } else if(element.attachEvent) {// IE
+                    element.attachEvent('on' + type, handler);
+                } else {// DOM0
+                    element['on' + type] = handler;
+                }
+            },
+            // element 删除 type 事件监听
+            removeHandler: function(element, type, handler) {
+                if(element.addEventListener) {// DOM2
+                    element.removeEventListener(type, handler, false);
+                } else if(element.attachEvent) {// IE
+                    element.detachEvent('on' + type, handler);
+                } else {// DOM0
+                    element['on' + type] = null;
+                }
+            },
+            // 获取事件
+            getEvent: function(event) {
+                return event ? event : window.event;
+            },
+            // 获取事件目标
+            getTarget: function(event) {
+                return event.target || event.srcElement;
+            },
+            // 阻止原生事件
+            preventDefault: function(event) {
+                if(event.preventDefault) {// DOM
+                    event.preventDefault();
+                } else {
+                    event.returnValue = false;
+                }
+            },
+            // 阻断事件传递
+            stopPropagation: function(event) {
+                if(event.stopPropagation) {// DOM
+                    event.stopPropagation();
+                } else {
+                    event.cancelBubble = true;
+                }
+            }
+        }
+
+        // 事件委托
+        let testEventProxy = function() {
+            let list = document.getElementById("myLinks");
+
+            EventUtil.addHandler(list, "click", function(event) {
+                event = EventUtil.getEvent(event);
+                let target = EventUtil.getTarget(event);
+            
+                switch(target.id){
+                    case "doSomething":
+                        document.title = target.id;
+                        console.log(target.id)
+                        break;
+            
+                    case "goSomewhere":
+                        location.href = "http://www.baidu.com";
+                        console.log(target.id)
+                        break;
+            
+                    case "sayHi":
+                        location.href = "http://www.wrox.com";
+                        console.log(target.id)
+                        break;
+                }
+            });
+        };
+        testEventProxy();
+
+
+    </script>
+</body>
+</html>
