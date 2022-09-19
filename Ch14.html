@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>This is a example page.</title>
+    <script>
+        function testDocment() {
+            console.log(document.documentElement)// 对 <html> 的引用
+            console.log(document.body)// 对 <body> 的引用
+
+            // 修改 document.title 会反应到浏览器上，且 document.title 也会改变
+            let tilte = document.title
+            console.log(tilte)// This is a example page.
+            document.title = 'hello world'
+            console.log(document.title)// hello world
+        }
+
+        // 动态加载 Script（外部引用）
+        function loadScript(url) {
+            let script = document.createElement("script")
+            script.type = "text/javascrpit"
+            script.src = url
+            document.body.appendChild(script)
+        }
+        // 动态加载 Script（内部引用）
+        function loadInnerScript(code) {
+            let script = document.createElement("script")
+            script.type = "text/javascript"
+            try {
+                script.appendChild(document.createTextNode(code))
+            } catch (ex) {
+                script.text = code
+            }
+            document.body.appendChild(script)
+        }
+
+        // 动态加载样式（外部引用）
+        function loadStyles(url) {
+            let link = document.createElement("link")
+            link.rel = "stylesheet"
+            link.type = "text/css"
+            link.href = url
+            document.getElementsByTagName("head")[0].appendChild(link)
+        }
+        // 动态加载样式（内部引用）
+        function loadInnerStyles(styleStr) {
+            let style = document.createElement("style"); style.type = "text/css"
+            try {
+                style.appendChild(document.createTextNode(styleStr))
+            } catch (ex) {
+                style.styleSheet.cssText = styleStr
+            }
+            let head = document.getElementsByTagName("head")[0]
+            head.appendChild(style)
+        }
+
+        // MutationObserver 的使用
+        function testMutation() {
+            let targetNode = document.body;// 选择需要观察变动的节点
+            const mutationObserverInit = { attributes: true, childList: true, subtree: true };// 观察器的内容（需要观察什么变动）
+            const callback = function (mutationRecordArr, observer) {// 当观察到变动时执行的回调函数
+                console.log('callback')
+                for (let record of mutationRecordArr) {
+                    if (record.type === 'childList') {
+                        console.log('A child node has been added or removed.');
+                        console.log(record);
+                    } else if (record.type === 'attributes') {
+                        console.log('The ' + record.attributeName + ' attribute was modified.');
+                        console.log(record);
+                    }
+                }
+            };
+            let observer = new MutationObserver(callback);// 创建一个观察器实例并传入回调函数
+            observer.observe(targetNode, mutationObserverInit);// 以上述信息开始观察目标节点
+
+            document.body.setAttribute('data-customer-attr1', 'JS');// 依次输出：callback、The data-customer-attr1 attribute was modified.、MutationRecord {...}
+            document.body.appendChild(document.createElement('div'));// 依次输出：A child node has been added or removed.、MutationRecord {...}
+            document.body.getElementsByTagName("div")[0].setAttribute('data-customer-attr2', 'JavaScript');//The data-customer-attr2 attribute was modified.、MutationRecord {...}
+
+            setTimeout(()=>{
+                observer.disconnect();// 停止观察。若不放在 setTimeout 中，则前面的改动都不会触发观察 callback
+            }, 0);
+        }
+    </script>
+</head>
+<body>
+    <input type="button" value="Docment类型" onclick="testDocment()" /><br><br>
+    <input type="button" value="动态加载 Script（外部引用）" onclick="loadScript('Ch03.js')"/><br><br>
+    <input type="button" value="动态加载样式（内部引用）" onclick="loadInnerStyles('body{background-color:red}')"/><br><br>
+    <input type="button" value="MutationObserver" onclick="testMutation()"/><br><br>
+</body>

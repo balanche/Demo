@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html>
+<head><title>Example</title></head>
+
+<body>
+	<script type="text/javascript">
+		window.addEventListener("storage", 
+		event => console.log(`Storage changed domain:${event.domain},key:${event.key},oldValue:${event.oldValue},newValue:${event.newValue}`));
+
+		sessionStorage.clear();
+
+		sessionStorage.setItem("name", "Tom");// sessionStorage.name = "Tom"	sessionStorage["name"]
+		sessionStorage.setItem("sex", "male");// sessionStorage.sex = "male"	sessionStorage["sex"]
+		sessionStorage.setItem("age", 18);// sessionStorage.age = 18	sessionStorage["age"]
+
+		for (let i = 0, len = sessionStorage.length; i < len; i++) {
+			let key = sessionStorage.key(i);
+			let value = sessionStorage.getItem(key);// let value = sessionStorage[key]
+			console.log(`1:${key}=${value}`);// 依次输出 1:age=18、1:name=Tom、1:sex=male
+		}
+
+		sessionStorage.setItem("name", "Peter");
+		sessionStorage.removeItem("age");// delete sessionStorage.age;
+
+		for (let i = 0, len = sessionStorage.length; i < len; i++) {
+			let key = sessionStorage.key(i);
+			let value = sessionStorage.getItem(key);
+			console.log(`2:${key}=${value}`);// 依次输出 2:name=Peter、2:sex=male
+		}
+
+
+		// 打开数据库
+		let version = 2;
+		let request = indexedDB.open("admin", version);
+		console.log(request);
+		request.onupgradeneeded = event=> {
+			let db = event.target.result;
+
+			// 如果存在则删除当前表，测试的时候可以这样做，但这样会在每次执行事件处理程序时删除已有数据
+			if (db.objectStoreNames.contains("userTable")) {
+				db.deleteObjectStore("userTable");
+			}
+
+			// 创建表结构
+			db.createObjectStore("userTable", { autoIncrement: true });
+			// db.createObjectStore("userTable", { keyPath: "username"})
+			db.close();
+
+			console.log(`数据库升级成功:${request === event.target}`);// 数据库升级成功:true
+		};
+		request.onsuccess = event=> {
+			console.log(`数据库打开成功:${request === event.target}`);// 数据库打开成功:true
+
+			let db = event.target.result;
+			let item = {
+				username: "Tom",
+				born: 1999,
+				sex: "male"
+			}
+
+			// 添加表数据
+			addItem(db, "userTable", item)
+			// re = store.get("007");
+			// store.add("wxh")
+
+			db.close();
+		};
+		request.onerror = event=> {
+			console.log(`数据库打开失败:${request === event.target}`);// 数据库打开失败:true
+			console.log(`错误码:${event.target.errorCode}`);
+		}
+
+		// 添加数据项
+		function addItem(db,table,item) {
+			let tra = db.transaction(table,"readwrite");
+			console.log(tra);
+			tra.oncomplete = event=> {
+				console.log(`事务打开成功：${tra === event.target}`);// 事务打开成功:true
+			}
+			tra.onerror = event=> {
+				console.log(`事务打开失败：${tra === event.target}`);// 事务打开失败:true
+			}
+
+			let storeTable = tra.objectStore(table);
+			console.log(storeTable);
+			storeTable.add(item)
+		}
+
+	</script>
+</body>
+</html>
