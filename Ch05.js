@@ -33,8 +33,10 @@ function testString() {
     console.log(str1 + '!');// Hello world!
     // 截取字符串：第一个参数为起始位置，第二个参数为终止位置
     console.log(str1.slice(1, 3));// el
+    console.log(str1.slice(-5));// world    :-5+长度11 = 6，相当于 str1.slice(6)
     // 截取字符串：第一个参数为起始位置，第二个参数为终止位置（省略代表全部）
     console.log(str1.substring(1, 3));// el
+    console.log(str1.substring(-5));// Hello world  :负数都当做 0
     // 截取字符串：第一个参数为起始位置，第二个参数个数（省略代表全部）
     console.log(str1.substr(1, 3));// ell
     // 从第二个参数（包含，省略代表全部）位置向后搜索第一个匹配字符串位置

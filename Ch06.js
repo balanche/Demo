@@ -4,13 +4,15 @@ function testObject() {
      * 因为对象属性可以通过点来访问，也可以通过方括号来表示
      */
     let n = 'userName';
-    let CEO = {sex: 'male'}
-    CEO[n] = 'Tom';
-    // let CEO = {
-    //     [n]: 'Tom',
-    //     sex: 'male'
-    // }
-    console.log(JSON.stringify(CEO));// {"userName":"Tom","sex":"male"}
+    // let CEO = {sex: 'male'}
+    // CEO[n] = 'Tom';
+    // CEO[3] = true; // 3自动转换为字符串
+    let CEO = {
+        [n]: 'Tom',
+        sex: 'male',
+        3: true  // 3自动转换为字符串
+    }
+    console.log(JSON.stringify(CEO));// {"3":true,"sex":"male","userName":"Tom"}
     console.log(CEO.userName);// Tom
     console.log(CEO[n]);// Tom
     console.log('\n');
@@ -19,6 +21,13 @@ function testObject() {
 function testArray() {
     let arr = ['h','e','l','l','o'];
     const str = 'hello world';
+    
+    // 动态改变数组
+    console.log(arr + '\tlength:' + arr.length)// h,e,l,l,o	length:5
+    arr[6] = 'w'
+    console.log(arr + '\tlength:' + arr.length)// h,e,l,l,o,,w	length:7
+    arr.length = 5
+    console.log(arr + '\tlength:' + arr.length)// h,e,l,l,o	length:5
 
     // 数组解构
     const [a,b,c,d,e] = arr;
@@ -32,6 +41,7 @@ function testArray() {
     // 扩展操作符：使用任何可以迭代的变量
     console.log([...str]);// ['h', 'e', 'l', 'l', 'o', ' ', 'w', 'o', 'r', 'l', 'd']
 
+    // 相当于复制数组
     let nArr = [...arr];
     let nArr2 = [...arr];
     console.log(nArr);// ['h', 'e', 'l', 'l', 'o']
@@ -109,13 +119,13 @@ function testArray() {
     const arr1 = [36,54,32,16]
     console.log('every-' +
         arr1.every((item,i,a)=> {
-        console.log(i + ':' + item);// 依次打印 0:36、1:54、2:32
+        console.log(i + ':' + item);// 依次打印 0:36、1:54、2:32 (会断言：没有执行3:16)
         return item > 32;
     }));// every-false
 
     console.log('some-' + 
         arr1.some((item,i,a)=> {
-        console.log(i + ':' + item);// 依次打印 0:36
+        console.log(i + ':' + item);// 依次打印 0:36 (会断言：没有执行后续的)
         return item > 32;
     }));// some-true
 
@@ -206,8 +216,17 @@ function testArray() {
     console.log(arr.concat(arr2));// ['h', 'e', 'l', 'l', 'o', ',', 'w']
     arr2[Symbol.isConcatSpreadable] = false;
     console.log(arr.concat(arr2));// ['h', 'e', 'l', 'l', 'o', [',', 'w']]
+    console.log(arr);// concat 不会改变原数组: ['h', 'e', 'l', 'l', 'o']
     
     console.log(arr.slice(0,3));// ['h', 'e', 'l']
+    console.log(arr);// slice 不会改变原数组: ['h', 'e', 'l', 'l', 'o']
+
+    let tmp = arr.splice(1,3,'-','+')
+    console.log(tmp)// ['e', 'l', 'l']
+    console.log(arr)// splice 会改变原数组: ['h', '-', '+', 'o']
+    // 还原下数组
+    arr.splice(1,2,'e','l','l')
+    console.log(arr)// ['h', 'e', 'l', 'l', 'o']
 
     /**
      * 搜索和位置
@@ -226,6 +245,26 @@ function testArray() {
         return item.toUpperCase() == 'L';
         })
     );// 2
+
+    // 归并函数
+    let values = [ 1 , 2 , 3 , 4 , 5 ] ; 
+    let sumReduce = values.reduce ((prev, cur , currIndex , array ) => {
+        // 依次打印 0--prev:100, cur:1、1--prev:101, cur:2、2--prev:103, cur:3、3--prev:106, cur:4、4--prev:110, cur:5
+        console.log(`${currIndex}--prev:${prev}, cur:${cur}`)
+        return prev + cur
+    }, 100);// 如果没有起始值 100，则 index 从 1 开始。即依次打印 1--prev:1, cur:2、2--prev:3, cur:3、3--prev:6, cur:4, cur:3、4--prev:10, cur:5
+    console.log(sumReduce);// 115
+
+// (1) 执行到 outerFunction 函数体，第一个栈帧被推到栈上。 
+// (2) 执行 outerFunction 函数体，到达 return 语句。为求值返回语句，必须先求值 innerFunction。 
+// (3) 引擎发现把第一个栈帧弹出栈外也没问题，因为 innerFunction 的返回值也是 outerFunction 的返回值。 
+// (4) 弹出 outerFunction 的栈帧。 
+// (5) 执行到 innerFunction 函数体，栈帧被推到栈上。 
+// (6) 执行 innerFunction 函数体，计算其返回值。 
+// (7) 将 innerFunction 的栈帧弹出栈外。
+function outerFunction(a, b) {
+    return innerFunction(a + b);
+}
 }
 
 function testMap() {
@@ -234,21 +273,22 @@ function testMap() {
      */
     // 方法一：嵌套数组初始化
     const m = new Map([
-        ['A','h'],
-        ['B','e'],
-        ['C','l'],
-        ['D','l'],
-        ['E','o'],
-        ['F','!']
+        ['1A','h'],
+        ['2B','e'],
+        ['3C','l'],
+        ['4D','l'],
+        ['5E','o'],
+        ['6F','!']
     ]);
 
     // 方法二：set 添加
     // const m = new Map()
-    //     .set('A','h')
-    //     .set('B','e')
-    //     .set('C','l')
-    //     .set('D','l')
-    //     .set('E','o');
+    //     .set('1A','h')
+    //     .set('2B','e')
+    //     .set('3C','l')
+    //     .set('4D','l')
+    //     .set('5E','o');
+    //     .set('6F','!');
 
     // 方法三：迭代器初始化
     // const m = new Map({
@@ -258,19 +298,21 @@ function testMap() {
     //         yield ['3C','l'];
     //         yield ['4D','l'];
     //         yield ['5E','o'];
+    //         yield ['6F','!'];
     //     } 
     // });
 
     // size 属性
-    console.log(m.size);// 5
+    console.log(m.size);// 6
     // 判断键值对是否存在
-    console.log(m.has('F'));// true
+    console.log(m.has('6F'));// true
     // 删除操作
-    m.delete('F');
-    console.log(m.has('F'));// false
+    m.delete('6F');
+    console.log(m.has('6F'));// false
 
     /**
      * 迭代方法
+     * 注意：第一个参数是 value，第二个是 key
      */
     m.forEach((v,k) => {
         console.log(k + ':' + v);// 依次打印 依次打印 '1A':'h'、'2B':'e'、'3C':'l'、'4D':'l'、'5E':'o'
@@ -294,8 +336,8 @@ function testMap() {
     /**
      * 改变 map 中的 key 规则（与复制变量值、传递参数规则一致）
      */
-    let keyO = {id: '1A'}
-    let keyBaseType = 11;
+    let keyO = {id: '1A'};// key 可以是 Object
+    let keyBaseType = 11;// key 可以是 Number
     let ma = new Map([
         [keyO, 'h']
         ,[keyBaseType, 'e']
@@ -308,7 +350,7 @@ function testMap() {
     for (let k of ma.keys()) {
         console.log(JSON.stringify(k));// 依次输出 {"id":"2B"}、11
     }
-    console.log([...ma]);// [ [{"id":"1A"},'h'],[11,'e'] ]
+    console.log([...ma]);// [ [{"id":"2B"},'h'],[11,'e'] ]
     ma.clear();// 清空 map 内容
     console.log([...ma]);// []
 }
@@ -363,6 +405,6 @@ function testSet() {
 }
 
 // testObject();
-// testArray();
+testArray();
 // testMap();
-testSet();
+// testSet();
