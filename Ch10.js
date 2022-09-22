@@ -244,4 +244,4 @@ function debounce(fn, delay) {
 // testFunArrow();
 // testFunParam();
 // testFunChangeCall();
-// testClosure();
+testClosure();

@@ -16,26 +16,29 @@
         function openWin() {
             mWindow = window.open('', '', 'width=200,height=200');
             mWindow.document.write('<div style="width: 150;height: 350;background-color: red;"></div><div style="width: 2000;height: 4000;background-color: aqua;">@@@@@ 这是一个新创建的窗口 @@@@@</div>');
+            
+            console.log(mWindow.screen.width, mWindow.screen.height);// 1280 720 （逻辑分辨率）
         }
         function moveWin() {// 移动窗口
-            console.log(mWindow.screenLeft,mWindow.screenTop);//0 23    因为 macbook 菜单栏为23px
+            
+            console.log(mWindow.screenLeft, mWindow.screenTop);//0 0
             mWindow.moveTo(100, 300);
-            console.log(mWindow.devicePixelRatio);// 2
-            console.log(mWindow.screenLeft,mWindow.screenTop);// 100 300
+            console.log(mWindow.devicePixelRatio);// 1.5  (DPI 像素比)
+            console.log(mWindow.screenLeft, mWindow.screenTop);// 100 300
 
             // mWindow.focus();
         }
         function resizeWin() {// 调整窗口
-            console.log(mWindow.outerWidth,window.outerHeight);// 200 548
-            console.log(mWindow.innerWidth,window.innerHeight);// 200 469
-            console.log(mWindow.document.documentElement.clientWidth,document.documentElement.clientHeight);// 200 469
+            console.log(mWindow.outerWidth, window.outerHeight);// 200 548
+            console.log(mWindow.innerWidth, window.innerHeight);// 200 469
+            console.log(mWindow.document.documentElement.clientWidth, document.documentElement.clientHeight);// 200 469
 
-            mWindow.resizeTo(300,300);
+            mWindow.resizeTo(300, 300);
         }
         function scrollWin() {// 滚动可视窗口
-            mWindow.scrollBy(10,30);
-            console.log(mWindow.pageXoffset|mWindow.scrollX,mWindow.pageYoffset|mWindow.scrollY);// 10 30
-            // mWindow.scrollTo(150,350);
+            mWindow.scrollBy(10, 30);
+            console.log(mWindow.pageXoffset|mWindow.scrollX, mWindow.pageYoffset|mWindow.scrollY);// 10 30
+            // mWindow.scrollTo(150, 350);
             mWindow.scrollTo({
                 left: 150,
                 top: 350,
@@ -49,7 +52,7 @@
             console.log(params.get('username'));// Tom
             console.log(params.has('num'))// true
             for (const [k,v] of params) {
-                console.log(k,v);// 依次输出q javascript、num 10、username Tom、pwd 123
+                console.log(`${k}:${v}`);// 依次输出 q:javascript、num:10、username:Tom、pwd:123
             }
 
             // 新建浏览器页面（有历史记录）
